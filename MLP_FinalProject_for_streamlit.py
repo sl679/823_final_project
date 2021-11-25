@@ -1,5 +1,4 @@
 
-
 import warnings
 warnings.filterwarnings('ignore')
 from pandas import DatetimeIndex
@@ -39,7 +38,7 @@ from statsmodels.tsa.ar_model import AR
 from statsmodels.tsa.arima_model import ARIMA
 from statsmodels.graphics.tsaplots import plot_acf,plot_pacf
 
-import plotly.offline as py 
+import plotly.offline as py
 import plotly.graph_objects as go
 import plotly.express as px
 pd.set_option('display.float_format', lambda x: '%.6f' % x)
@@ -51,9 +50,9 @@ import wget
 
 
 import streamlit as st
-import pandas as pd
-import numpy as np
-import plotly.express as px
+
+
+
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 
@@ -100,7 +99,7 @@ valid_ml=datewise_state.iloc[int(datewise_state.shape[0]*0.85):]
 
 
 def plot_result(data_d,new_date_time_index, forecast, gcolor, gcase, gtitle):
-    
+
     plt.style.use('seaborn-white')
     plt.plot(data_d,label="Actual "+gcase,color=gcolor, linestyle='solid', linewidth = 3, marker='o', markerfacecolor=gcolor, markersize=12)
     plt.plot(new_date_time_index,forecast,label="Predicted "+gcase,color='black', linestyle='solid', linewidth = 3, marker='*', markerfacecolor='black', markersize=12)
@@ -110,7 +109,7 @@ def plot_result(data_d,new_date_time_index, forecast, gcolor, gcase, gtitle):
 
 
 def new_forecast(prediction,new_prediction,new_date):
-    
+
     forecast=np.concatenate((prediction,new_prediction))
 
     new_ar = []
@@ -145,34 +144,34 @@ def MLPRegression_covid_19(train_d,valid_d,data_d,case):
 
     model_scores=[]
 
-    
-    mlp=MLPRegressor(hidden_layer_sizes=[20,10,5], max_iter=50000, alpha=0.0005, random_state=26)  
- 
+
+    mlp=MLPRegressor(hidden_layer_sizes=[20,10,5], max_iter=50000, alpha=0.0005, random_state=26)
+
     mlp.fit(np.array(train_ml["Days Since"]).reshape(-1,1),np.array(train_d).reshape(-1,1))
 
     print(case)
 
     prediction_valid_mlp=mlp.predict(np.array(valid_ml["Days Since"]).reshape(-1,1))
 
-    
+
     model_scores.append(np.sqrt(mean_squared_error(valid_d,prediction_valid_mlp)))
     print("RMSE for MLP: ",model_scores)
 
     eval_reg(valid_d,prediction_valid_mlp)
-    
+
     prediction_mlp=mlp.predict(np.array(datewise_state["Days Since"]).reshape(-1,1))
- 
-  
+
+
 
     new_date=[]
     new_prediction_mlp=[]
 
     for i in range(1,day):
         new_date.append(datewise_state.index[-1]+timedelta(days=i))
-        new_prediction_mlp.append(mlp.predict(np.array(datewise_state["Days Since"].max()+i).reshape(-1,1))[0]) 
+        new_prediction_mlp.append(mlp.predict(np.array(datewise_state["Days Since"].max()+i).reshape(-1,1))[0])
 
     forecast_mlp, new_date_time_index =new_forecast(prediction_mlp,new_prediction_mlp,new_date)
-    
+
 
 
     return (forecast_mlp, new_date_time_index, model_scores)
@@ -185,31 +184,29 @@ forecast_mlp_d, new_date_time_index_d, model_score_mlp_d = MLPRegression_covid_1
 
 
 fig1 = go.Figure()
- 
-    
+
+
 fig1 = px.line(datewise_state, x=new_date_time_index_d, y=forecast_mlp_d )
 fig1.add_scatter(x=new_date_time_index_d, y=datewise_state['tot_cases'])
 
-  
+
 fig1.update_traces(showlegend=True)
 
-    
+
 fig1.update_layout(
  title="The Time seris plot that shows the total cases of COVID-19 in North Carolina",
  xaxis_title="Time start from 2020-12-14 ",
  yaxis_title="Total number of COVID-19 cases ",
  legend_title="Legend Title: Purple(Predicted), Red(Actual Cases)",
- 
-     
+
+
  font=dict(
     family="Courier New, monospace",
     size=12,
     color="RebeccaPurple"
 )
-     
 
-     
+
+
 )
-
 st.plotly_chart(fig1, use_container_width=True)
-
