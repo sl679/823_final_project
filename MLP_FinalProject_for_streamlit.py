@@ -1,7 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[4]:
 
 
 import warnings
@@ -62,19 +58,15 @@ from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 
 
-# In[6]:
 
-
-
-
-covid = pd.read_csv('/Users/shenjiajie/Desktop/Duke/823/United_States_COVID-19_Cases_and_Deaths_by_State_over_Time.csv')
+covid = pd.read_csv('United_States_COVID-19_Cases_and_Deaths_by_State_over_Time.csv')
 
 covid['submission_date'] = pd.to_datetime(covid['submission_date'])
 
 covid = covid.sort_values(by = 'submission_date')
 
 
-# In[7]:
+
 
 
 state_data=covid[covid["state"]=="NC"]
@@ -91,7 +83,6 @@ state_data = state_data.loc[mask]
 datewise_state=state_data.groupby(["submission_date"]).agg({"tot_cases":'sum'})
 
 
-# In[8]:
 
 
 datewise_state["Days Since"]=datewise_state.index-datewise_state.index[0]
@@ -107,9 +98,6 @@ train_ml= datewise_state.iloc[:int(datewise_state.shape[0]*0.85)]
 valid_ml=datewise_state.iloc[int(datewise_state.shape[0]*0.85):]
 
 
-# In[9]:
-
-
 
 def plot_result(data_d,new_date_time_index, forecast, gcolor, gcase, gtitle):
     
@@ -118,7 +106,7 @@ def plot_result(data_d,new_date_time_index, forecast, gcolor, gcase, gtitle):
     plt.plot(new_date_time_index,forecast,label="Predicted "+gcase,color='black', linestyle='solid', linewidth = 3, marker='*', markerfacecolor='black', markersize=12)
 
 
-# In[10]:
+
 
 
 def new_forecast(prediction,new_prediction,new_date):
@@ -140,7 +128,6 @@ def new_forecast(prediction,new_prediction,new_date):
 
 
 
-# In[12]:
 
 
 def eval_reg(y,y_p):
@@ -150,7 +137,7 @@ def eval_reg(y,y_p):
     print("R2-Squared:", r2_score(y,y_p))
 
 
-# In[16]:
+
 
 
 
@@ -191,15 +178,10 @@ def MLPRegression_covid_19(train_d,valid_d,data_d,case):
     return (forecast_mlp, new_date_time_index, model_scores)
 
 
-# In[25]:
-
-
 t41 = time.process_time()
 
 forecast_mlp_d, new_date_time_index_d, model_score_mlp_d = MLPRegression_covid_19(train_ml["tot_cases"],valid_ml["tot_cases"],datewise_state["tot_cases"],'Total Cases')
 
-
-# In[24]:
 
 
 fig1 = go.Figure()
