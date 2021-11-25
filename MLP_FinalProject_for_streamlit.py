@@ -210,5 +210,5 @@ fig1.update_layout(
 
      
 )
-fig1.show()
+  st.plotly_chart(fig1, use_container_width=True)
 
